@@ -1,12 +1,13 @@
-
+import Chat from './Chat.tsx'
+import Contacts from './Contacts.tsx'
 
 function App() {
-  return (
-    <>
-      <h1 className="">Pspspsps</h1>
-      <h1>Pspspsp</h1>
-    </>
-  )
+    return (
+   		<>
+   	 		<Chat/>
+			<Contacts/>
+		</>
+    )
 }
 
 export default App
