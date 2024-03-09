@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import './message.css'
+import ContentEditable from 'react-contenteditable'
 
 export default function Chat()
 {
@@ -25,13 +26,11 @@ export default function Chat()
                                  {id: 7, value: "Seen message", sendOn: "00-00-0000", flag: MessFlags.Seen},
                                  {id: 8, value: "Incomming message", sendOn: "00-00-0000", flag: MessFlags.Incomming}]
     
-    function outgoing(m: Message): boolean
-    {
+    const outgoing = (m: Message): boolean => {
         return (m.flag === MessFlags.Seen || m.flag === MessFlags.Send || m.flag === MessFlags.SendAndReceived)
     }
 
-    function groupMessages(inputArray: Message[]) : Message[][]
-    {
+    const groupMessages = (inputArray: Message[]) : Message[][] => {
         return inputArray.reduce((result: Message[][], currentElement, index, array) => {
             if (index === 0 || (currentElement.flag === MessFlags.Incomming && outgoing(array[index - 1])) || 
                 (currentElement.flag !== MessFlags.Incomming && !outgoing(array[index - 1])))
@@ -43,34 +42,40 @@ export default function Chat()
         }, [])
     }
 
-    console.log(groupMessages(messages));
+    const[messagesData, updateMessages] = useState(messages)
+    const[editorContent, setEditorContent] = useState('Send message...')
+
+    
+    console.log(groupMessages(messagesData))
     return (
         <div className="w-4/5 h-full flex flex-col justify-between">
             <div className="w-5/5 bg-neutral-900 h-16">
 
             </div>
             <div className="h-full bg-neutral-800 overflow-x-auto">
-            {groupMessages(messages).map((msGroup, index) => {
+            {groupMessages(messagesData).map((msGroup, index) => {
                 if(msGroup[0].flag === MessFlags.Incomming)
                 {
                     return <ul key={index} className="group-custom-received list-none flex flex-col items-start text-slate-300 mx-2 my-1">{
                         msGroup.map(ms => {
-                            return <li key={ms.id} className=" bg-neutral-600 max-w-fit p-1 px-2 my-px text-sm">{ms.value}</li>
+                            return <li key={ms.id} className="bg-neutral-600 max-w-fit p-1 px-2 my-px text-sm">{ms.value}</li>
                     })}</ul>
                 }
                 else
                 {
                     return <ul key={index} className="group-custom-send list-none flex flex-col items-end text-slate-300 mx-2 my-1">{
                         msGroup.map(ms => {
-                            return <li key={ms.id} className=" bg-neutral-600 max-w-fit p-1 px-2 my-px text-sm">{ms.value}</li>
+                            return <li key={ms.id} className="bg-neutral-600 max-w-fit p-1 px-2 my-px text-sm">{ms.value}</li>
                     })}</ul>
-                }
-                
+                }                
             })}
             </div>
-            <div className="w-5/5 bg-neutral-900 h-12">
-                <input type="text" className=""/>
-                <button onClick={() => {}}></button>
+            <div className="w-5/5 bg-neutral-900 h-fit max-h-40 flex items-center items-stretch">
+                <ContentEditable html={editorContent} onChange={() => {}} className="outline-none bg-neutral-600 my-2 min-h-7 max-h-36 w-full text-sm px-3 resize-none overflow-x-auto"/>
+                
+                <div className="flex flex-col justify-end my-2 min-h-7 max-h-36 ">
+                    <button className="h-7 bg-blue-500 text-sm text-white font-semibold py-1 px-3 rounded-full">Send</button>
+                </div>
             </div>
         </div>
     )

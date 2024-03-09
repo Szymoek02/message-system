@@ -4,8 +4,8 @@ import Contacts from './Contacts.tsx'
 function App() {
     return (
    		<>
-   	 		<Chat/>
 			<Contacts/>
+   	 		<Chat/>
 		</>
     )
 }
