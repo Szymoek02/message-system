@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useState, useCallback } from "react";
 import './message.css'
 import ContentEditable from 'react-contenteditable'
+import sanitizeHtml from 'sanitize-html';
 
 export default function Chat()
 {
@@ -43,10 +44,23 @@ export default function Chat()
     }
 
     const[messagesData, updateMessages] = useState(messages)
-    const[editorContent, setEditorContent] = useState('Send message...')
+    const[editorContent, setEditorContent] = useState('')
 
+    const onContentChange = useCallback((evt: any) => {
+		const sanitizeConf = {
+			allowedTags: ["b", "i", "a", "p"],
+			allowedAttributes: { a: ["href"] }
+		};
+
+		setEditorContent(sanitizeHtml(evt.currentTarget.innerHTML))
+	}, [])
+
+    // const handleTextInput = (event: any) => {
+    //     console.log(event.target.value);
+    //     setEditorContent(String(event.target.value))
+    // }
     
-    console.log(groupMessages(messagesData))
+    //console.log(groupMessages(messagesData))
     return (
         <div className="w-4/5 h-full flex flex-col justify-between">
             <div className="w-5/5 bg-neutral-900 h-16">
@@ -71,10 +85,10 @@ export default function Chat()
             })}
             </div>
             <div className="w-5/5 bg-neutral-900 h-fit max-h-40 flex items-center items-stretch">
-                <ContentEditable html={editorContent} onChange={() => {}} className="outline-none bg-neutral-600 my-2 min-h-7 max-h-36 w-full text-sm px-3 resize-none overflow-x-auto"/>
+                <ContentEditable html={editorContent} data-placeholder="Send Message..." onChange={onContentChange}  className="leading-7 rounded-xl outline-none bg-neutral-600 my-2 mx-2 min-h-7 max-h-36 w-full text-sm px-3 resize-none overflow-x-auto"/>
                 
                 <div className="flex flex-col justify-end my-2 min-h-7 max-h-36 ">
-                    <button className="h-7 bg-blue-500 text-sm text-white font-semibold py-1 px-3 rounded-full">Send</button>
+                    <button className="h-7 w-7 bg-blue-500 text-sm text-white font-semibold py-3 px-3 rounded-full"></button>
                 </div>
             </div>
         </div>
